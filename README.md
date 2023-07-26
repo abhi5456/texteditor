@@ -1,8 +1,11 @@
 # texteditor
 
 ## Available Scripts
-
 In the project directory, you can run:
+
+### `npm install`
+
+Runs the npm installer to install any packages that might not be there
 
 ### `npm start`
 
@@ -12,47 +15,33 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
 
-### `npm test`
+### `node server.js`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Runs the server on port 8000.\
+If you already have something in that port, you can change the port number.\
+If you make any changes to server.js you will need to restart the server
+to see the changes. 
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Architecture Details:
+- Frontend built using react
+    - enables responsive user interface with easy state managment
+- Backend using Node.js and Websocket
+    - enables real time communication
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+I used node.js because it is scalable and has good communication with websocket connections.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+I used websockets becuase there are better communication channels for it under a single TCO connection. This means that there can be a low-latency update sent between the server and the text editors to enable real time collaboration.
 
-## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Tradeoffs:
+- There are alot of synchronization issues that can occur such as concurrent editing and conflicts during the editing. This would require more careful considerations of what should be done in each case.
+- There is also some network considerations that should be done when developing this product further as there should be optimizations to decrease latency and have efficient data transfer/
+- Testing on different browsers and Wifi speeds, choose to go with chrome and good wifi speeds
 
-To learn React, check out the [React documentation](https://reactjs.org/).
 
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Given more time:
+- add scalability features such as distibuting the load across multiple servers or adding microservices
+- have more conflict resolution features/include and AI that would be able to choose the best fit
+- adding indicators to what the users are doing, such as where the cursor is, if the user is on the page, ect.
+- adding offline editing and using AI to combine the texts when online
