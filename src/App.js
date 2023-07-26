@@ -5,6 +5,10 @@ const socket = new WebSocket('ws://localhost:8000');
 
 function App() {
   const [text, setText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+
+  let typingTimeout = null;
+
   useEffect(() => {
     socket.onopen = () => {
       console.log('WebSocket Connected');
@@ -14,6 +18,8 @@ function App() {
       const { type, data } = JSON.parse(event.data);
       if (type === 'textUpdate') {
         setText(data);
+      } else if (type === 'userTyping') {
+        setIsTyping(data);
       }
     };
   }, []);
@@ -21,10 +27,25 @@ function App() {
   const handleChange = (event) => {
     const newText = event.target.value;
     setText(newText);
+    clearTimeout(typingTimeout);
     socket.send(JSON.stringify({ type: 'textUpdate', data: newText }));
+    if (!isTyping) {
+      setIsTyping(true);
+      socket.send(JSON.stringify({ type: 'userTyping', data: true }));
+    }
+    typingTimeout = setTimeout(() => {
+      setIsTyping(false);
+      socket.send(JSON.stringify({ type: 'userTyping', data: false }));
+    }, 1000);
   };
 
-  const handleBlur = () => {};
+  const handleBlur = () => {
+    clearTimeout(typingTimeout);
+    if (isTyping) {
+      setIsTyping(false);
+      socket.send(JSON.stringify({ type: 'userTyping', data: false }));
+    }
+  };
 
   return (
     <div className="App">
@@ -37,6 +58,7 @@ function App() {
         onBlur={handleBlur}
         placeholder="Type Something..."
       />
+      {isTyping && <p>Someone is typing...</p>}
     </div>
   );
 }

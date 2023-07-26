@@ -7,6 +7,7 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 let sameText = '';
+let typingClients = new Set();
 
 wss.on('connection', (ws) => {
   ws.on('message', (message) => {
@@ -18,8 +19,29 @@ wss.on('connection', (ws) => {
           client.send(JSON.stringify({ type: 'textUpdate', data: sameText }));
         }
       });
+    } else if (type === 'userTyping') {
+      if (data) {
+        typingClients.add(ws);
+      } else {
+        typingClients.delete(ws);
+      }
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({ type: 'userTyping', data: typingClients.size > 0 }));
+        }
+      });
     }
   });
+
+  ws.on('close', () => {
+    typingClients.delete(ws);
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({ type: 'userTyping', data: typingClients.size > 0 }));
+      }
+    });
+  });
+
   ws.send(JSON.stringify({ type: 'textUpdate', data: sameText }));
 });
 
